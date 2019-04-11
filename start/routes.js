@@ -17,7 +17,8 @@
 const Route = use("Route");
 
 Route.get("/v1/products", "ProductController.index");
-Route.get("/v1/products/:id", "ProductController.show");
+Route.get("/v1/product/:id", "ProductController.show");
 
 Route.get("/v1/orders", "OrderController.index");
 Route.post("/v1/order", "OrderController.store");
+Route.delete("/v1/order/:id", "OrderController.destroy");

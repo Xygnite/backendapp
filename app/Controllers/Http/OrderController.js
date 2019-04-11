@@ -53,15 +53,21 @@ class OrderController {
    * @param {Response} ctx.response
    */
   async store({ request, response }) {
-    const { product_id, qty, price } = request.post();
+    const { product_id, qty, price, addOrChange } = request.post();
 
     const order = new Order();
     const state = await Order.query()
       .where("product_id", product_id)
       .fetch();
     const check = await Order.findBy("product_id", product_id);
-    if (state.rows.length !== 0) {
+    if (state.rows.length !== 0 && addOrChange == "add") {
       check.merge({ qty: check.qty + qty });
+      await check.save();
+      response.json({
+        messages: "update success!"
+      });
+    } else if (state.rows.length !== 0 && addOrChange == "change") {
+      check.merge({ qty: parseInt(qty) });
       await check.save();
       response.json({
         messages: "update success!"
@@ -117,7 +123,13 @@ class OrderController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy({ params, request, response }) {}
+  async destroy({ params: { id }, request, response }) {
+    const order = await Order.find(id);
+    await order.delete();
+    response.json({
+      messages: "delete success!"
+    });
+  }
 }
 
 module.exports = OrderController;
